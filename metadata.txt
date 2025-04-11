@@ -1,0 +1,8 @@
+[general]
+name=Treesta Importer
+description=Konvertiert externe Baumkataster für den Import nach Treesta. Converts external tree inventories for import into Treesta
+version=1.0
+qgisMinimumVersion=3.40
+author=Baumsicht
+email=mail@baumsicht.de
+about=Dieses Plugin hilft bei der Umwandlung von alten oder externen Baumkatastern in das Treesta-kompatible CSV-Format.

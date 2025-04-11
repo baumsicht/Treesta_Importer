@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TreestaImporterDialogBase</class>
+ <widget class="QDialog" name="TreestaImporterDialogBase">
+  <property name="windowTitle">
+   <string>Treesta Importer</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="labelInstructions">
+     <property name="text">
+      <string>Bitte wählen Sie das alte Kataster (CSV-Datei):</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="lineEditInput"/>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnBrowse">
+     <property name="text">
+      <string>Durchsuchen...</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnConvert">
+     <property name="text">
+      <string>Umwandlung starten</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="labelStatus">
+     <property name="text">
+      <string>Status: bereit</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
