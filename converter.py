@@ -5,6 +5,7 @@ import os
 def clean_species(value):
     if value is None:
         return value
+    # Entfernt führende Zahlen und Leerzeichen und alles in Klammern
     value = re.sub(r'^\d+\s*', '', value)
     value = re.sub(r'\s*\([^)]*\)', '', value)
     return value.strip()
@@ -15,7 +16,7 @@ def map_compound_value_exact(text, value_dict, unmapped_set):
     # Prüfe, ob der gesamte Inhalt als Schlüssel existiert
     if key_whole in value_dict:
         return "{" + value_dict[key_whole] + "}"
-    # Ansonsten splitte anhand des Kommas und mappe die einzelnen Bestandteile
+    # Andernfalls: Splitte anhand des Kommas und mappe die einzelnen Bestandteile
     inner = key_whole.split(",")
     translated = []
     for item in inner:
@@ -38,8 +39,8 @@ def convert_kataster(input_csv_path, field_mapping_path, value_mapping_path, out
     output_csv = os.path.join(output_dir, "treesta_import.csv")
     unmapped_txt = os.path.join(output_dir, "unmapped_values.txt")
 
-    # Liste der Felder, bei denen Werte gemappt werden sollen
-    prüffelder = [
+    # Liste der Felder, bei denen das Werte-Mapping angewendet werden soll
+    prueffelder = [
         "condition", "vitality", "development", "safety_expectation", "tree_safety",
         "life_expectancy", "restriction", "features_crown", "features_trunk",
         "features_trunkbase_root_collar", "features_root_surroundings",
@@ -79,8 +80,10 @@ def convert_kataster(input_csv_path, field_mapping_path, value_mapping_path, out
     for row in input_rows:
         new_row = {}
         for old_key, value in row.items():
+            # Bestimme den neuen Feldnamen; falls nicht vorhanden, wird der alte Wert verwendet
             new_key = field_dict.get(old_key.strip(), old_key.strip())
-            if new_key not in prüffelder:
+            # Überprüfe, ob das Mapping für diesen Feldnamen angewendet werden soll
+            if new_key not in prueffelder:
                 new_val = convert_booleans(value)
             else:
                 val = value.strip() if isinstance(value, str) else value
@@ -93,22 +96,26 @@ def convert_kataster(input_csv_path, field_mapping_path, value_mapping_path, out
                 new_val = convert_booleans(new_val)
             new_row[new_key] = new_val
 
+        # Extrahiere "species" aus "baumart", falls vorhanden
         if "baumart" in row:
             new_row["species"] = clean_species(row["baumart"])
 
         output_rows.append(new_row)
 
+    # Beibehaltung der ursprünglichen Spaltenreihenfolge, ggf. mit "species" als Anhang
     output_fieldnames = list(dict.fromkeys(
         [field_dict.get(f.strip(), f.strip()) for f in original_fields] +
         (["species"] if "species" in output_rows[0] else [])
     ))
 
+    # Schreibe unmapped_values mit zusätzlicher Fehlermeldung in die Textdatei
     if unmapped_values:
         with open(unmapped_txt, "w", encoding="utf-8") as f:
-            f.write("Nicht gemappte Werte (value_mapping.csv ergänzen):\n")
+            f.write("Nicht gemappte Werte (value_mapping.csv ergänzen - möglicherweise inkonsistente Daten oder fehlerhafte Kommata):\n")
             for val in sorted(unmapped_values):
                 f.write(f"{val}\n")
 
+    # Exportiere die Daten als CSV mit Quotechar, um Fehler bei Kommata zu vermeiden
     with open(output_csv, "w", encoding="utf-8", newline='') as f:
         writer = csv.DictWriter(f, fieldnames=output_fieldnames, delimiter=";", quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writeheader()
