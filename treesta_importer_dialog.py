@@ -13,7 +13,9 @@ class TreestaImporterDialog(QDialog, FORM_CLASS):
         self.btnConvert.clicked.connect(self.convert)
 
     def browse_input(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Altes Kataster wählen", "", "CSV-Dateien (*.csv)")
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "Altes Kataster wählen", "", "CSV-Dateien (*.csv)"
+        )
         if file_path:
             self.lineEditInput.setText(file_path)
 
@@ -22,11 +24,12 @@ class TreestaImporterDialog(QDialog, FORM_CLASS):
         if not input_path or not os.path.exists(input_path):
             self.labelStatus.setText("⚠ Bitte eine gültige CSV-Datei auswählen!")
             return
+
         base_dir = os.path.dirname(input_path)
-        field_mapping_path = os.path.join(os.path.dirname(__file__), "fields_mapping.csv")
-        value_mapping_path = os.path.join(os.path.dirname(__file__), "value_mapping.csv")
+        output_csv = os.path.join(base_dir, "treesta_import.csv")
+
         try:
-            output_csv, unmapped_txt = convert_kataster(input_path, field_mapping_path, value_mapping_path, base_dir)
+            convert_kataster(input_path, output_csv)
             self.labelStatus.setText("✅ Umwandlung abgeschlossen!")
         except Exception as e:
             self.labelStatus.setText(f"❌ Fehler: {str(e)}")

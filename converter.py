@@ -2,44 +2,12 @@ import csv
 import re
 import os
 
-def clean_species(value):
-    if value is None:
-        return value
-    # Entfernt führende Zahlen und Leerzeichen und alles in Klammern
-    value = re.sub(r'^\d+\s*', '', value)
-    value = re.sub(r'\s*\([^)]*\)', '', value)
-    return value.strip()
+def convert_kataster(input_data_path, output_path):
+    plugin_dir = os.path.dirname(__file__)
+    field_mapping_path = os.path.join(plugin_dir, "fields_mapping.csv")
+    value_mapping_path = os.path.join(plugin_dir, "value_mapping.csv")
+    unmapped_output_path = os.path.join(os.path.dirname(input_data_path), "unmapped_values.txt")
 
-def map_compound_value_exact(text, value_dict, unmapped_set):
-    # Entferne die äußeren geschweiften Klammern und trimme den Inhalt
-    key_whole = text.strip("{}").strip()
-    # Prüfe, ob der gesamte Inhalt als Schlüssel existiert
-    if key_whole in value_dict:
-        return "{" + value_dict[key_whole] + "}"
-    # Andernfalls: Splitte anhand des Kommas und mappe die einzelnen Bestandteile
-    inner = key_whole.split(",")
-    translated = []
-    for item in inner:
-        item_clean = item.strip()
-        if item_clean not in value_dict:
-            unmapped_set.add(item_clean)
-        translated.append(value_dict.get(item_clean, item_clean))
-    return "{" + ", ".join(translated) + "}"
-
-def convert_booleans(val):
-    if isinstance(val, str):
-        lower = val.strip().lower()
-        if lower == "true":
-            return "1"
-        if lower == "false":
-            return "0"
-    return val
-
-def convert_kataster(input_csv_path, field_mapping_path, value_mapping_path, output_dir):
-    output_csv = os.path.join(output_dir, "treesta_import.csv")
-    unmapped_txt = os.path.join(output_dir, "unmapped_values.txt")
-
-    # Liste der Felder, bei denen das Werte-Mapping angewendet werden soll
     prueffelder = [
         "condition", "vitality", "development", "safety_expectation", "tree_safety",
         "life_expectancy", "restriction", "features_crown", "features_trunk",
@@ -54,22 +22,54 @@ def convert_kataster(input_csv_path, field_mapping_path, value_mapping_path, out
         "habitat_affected", "habitat_avoidance", "habitat_mitigation", "habitat_replacement"
     ]
 
-    # Feld-Mapping laden
+    def clean_species(value):
+        if value is None:
+            return value
+        value = re.sub(r'^\d+\s*', '', value)
+        value = re.sub(r'\s*\([^)]*\)', '', value)
+        return value.strip()
+
+    def convert_booleans(val):
+        if isinstance(val, str):
+            lower = val.strip().lower()
+            if lower == "true":
+                return "1"
+            if lower == "false":
+                return "0"
+        return val
+
+    def map_compound_value_exact(text, value_dict, unmapped_set):
+        if not text or not text.startswith("{") or not text.endswith("}"):
+            val_clean = text.replace(",", "").strip()
+            if val_clean not in value_dict:
+                unmapped_set.add(text)
+            return value_dict.get(val_clean, text)
+        inner = text.strip("{}").split(",")
+        translated = []
+        for item in inner:
+            raw = item.strip()
+            cleaned = raw.replace(",", "")
+            mapped = value_dict.get(cleaned, raw)
+            if cleaned not in value_dict:
+                unmapped_set.add(raw)
+            translated.append(mapped)
+        return "{" + ", ".join(translated) + "}"
+
+    # Mapping-Tabellen laden
     field_dict = {}
     with open(field_mapping_path, encoding="utf-8", newline='') as f:
         reader = csv.DictReader(f, delimiter=";")
         for row in reader:
-            field_dict[row["old_field"].strip()] = row["new_field"].strip()
+            field_dict[row["old_field"]] = row["new_field"]
 
-    # Wert-Mapping laden
     value_dict = {}
     with open(value_mapping_path, encoding="utf-8", newline='') as f:
         reader = csv.DictReader(f, delimiter=";")
         for row in reader:
-            value_dict[row["old_value"].strip()] = row["new_value"].strip()
+            key = row["old_value"].strip().replace(",", "")
+            value_dict[key] = row["new_value"].strip()
 
-    # Quelldaten laden
-    with open(input_csv_path, encoding="utf-8", newline='') as f:
+    with open(input_data_path, encoding="utf-8", newline='') as f:
         reader = csv.DictReader(f, delimiter=";", quotechar='"')
         input_rows = list(reader)
         original_fields = reader.fieldnames
@@ -80,45 +80,31 @@ def convert_kataster(input_csv_path, field_mapping_path, value_mapping_path, out
     for row in input_rows:
         new_row = {}
         for old_key, value in row.items():
-            # Bestimme den neuen Feldnamen; falls nicht vorhanden, wird der alte Wert verwendet
-            new_key = field_dict.get(old_key.strip(), old_key.strip())
-            # Überprüfe, ob das Mapping für diesen Feldnamen angewendet werden soll
+            new_key = field_dict.get(old_key, old_key)
+            val = value.strip() if isinstance(value, str) else value
             if new_key not in prueffelder:
-                new_val = convert_booleans(value)
+                new_val = convert_booleans(val)
             else:
-                val = value.strip() if isinstance(value, str) else value
-                if isinstance(val, str) and val.startswith("{") and val.endswith("}"):
-                    new_val = map_compound_value_exact(val, value_dict, unmapped_values)
-                else:
-                    if val not in value_dict:
-                        unmapped_values.add(val)
-                    new_val = value_dict.get(val, val)
+                new_val = map_compound_value_exact(val, value_dict, unmapped_values)
                 new_val = convert_booleans(new_val)
             new_row[new_key] = new_val
 
-        # Extrahiere "species" aus "baumart", falls vorhanden
         if "baumart" in row:
             new_row["species"] = clean_species(row["baumart"])
 
         output_rows.append(new_row)
 
-    # Beibehaltung der ursprünglichen Spaltenreihenfolge, ggf. mit "species" als Anhang
     output_fieldnames = list(dict.fromkeys(
-        [field_dict.get(f.strip(), f.strip()) for f in original_fields] +
-        (["species"] if "species" in output_rows[0] else [])
+        [field_dict.get(f, f) for f in original_fields] + (["species"] if "species" in output_rows[0] else [])
     ))
 
-    # Schreibe unmapped_values mit zusätzlicher Fehlermeldung in die Textdatei
     if unmapped_values:
-        with open(unmapped_txt, "w", encoding="utf-8") as f:
-            f.write("Nicht gemappte Werte (value_mapping.csv ergänzen - möglicherweise inkonsistente Daten oder fehlerhafte Kommata):\n")
+        with open(unmapped_output_path, "w", encoding="utf-8") as f:
+            f.write("Nicht gemappte Werte (nach Entfernung von Kommas):\n\n")
             for val in sorted(unmapped_values):
                 f.write(f"{val}\n")
 
-    # Exportiere die Daten als CSV mit Quotechar, um Fehler bei Kommata zu vermeiden
-    with open(output_csv, "w", encoding="utf-8", newline='') as f:
+    with open(output_path, "w", encoding="utf-8", newline='') as f:
         writer = csv.DictWriter(f, fieldnames=output_fieldnames, delimiter=";", quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writeheader()
         writer.writerows(output_rows)
-
-    return output_csv, unmapped_txt if unmapped_values else None
