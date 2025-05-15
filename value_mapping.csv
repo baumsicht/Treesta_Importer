@@ -1,5 +1,5 @@
 new_value;old_value
-slightly damaged;gesund leicht geschädigt
+slightly damaged;gesund, leicht geschädigt
 more severely damaged;stärker geschädigt
 dead;absterbend/tot
 good;gut
@@ -21,10 +21,10 @@ cavity;09 Höhlungen
 crown defects ;10 Fehlentwicklungen in der Krone
 bark damage;11 Rindenschäden
 twin stem;12 Zwiesel
-epicormic branches or stems;13 Ständer Steiläste
+epicormic branches or stems;13 Ständer, Steiläste
 fungi;14 Pilzbefall
 cracks;15 Astrisse
-foliage (abnormalities, leaf diseases) ;16 Belaubung (Auffälligkeiten Blattkrankheiten)
+foliage (abnormalities, leaf diseases) ;16 Belaubung (Auffälligkeiten, Blattkrankheiten)
 pests;17 Schadinsekten
 root injuries;01 Wurzelverletzungen
 clearing;02 Freistellung
@@ -53,13 +53,13 @@ cracks;11 Risse
 sap oozing ;12 Ausfluss
 growth anomalies ;13 Wuchsanomalien
 compensatory growth ;14 Kompensationswachstum
-threaded bars, seals, drainage pipes;15 Gewindestangen Plomben Entwässerungsrohre
+threaded bars, seals, drainage pipes;15 Gewindestangen, Plomben, Entwässerungsrohre
 pests;16 Schadinsekten
 inclination ;17 Schrägstand
 injuries;01 Verletzungen
 bark damage ;02 Rindenschäden
 cracks;03 Risse
-adventitious root ;04 Adventiv- Würgewurzeln
+adventitious root ;04 Adventiv-, Würgewurzeln
 cavity;05 Höhlungen
 fungi;06 Pilzbefall
 compensatory growth ;07 Kompensationswachstum
@@ -109,7 +109,7 @@ restoration pruning of damaged trees with multiple epicormic branches or stems ;
 inspection and maintenance of cabling systems;11 Untersuchung und Wartung von Kronensicherungen
 further inspection ;12 weitere Inaugenscheinnahme
 removal of trunk and basal sprouts;13 Entfernung von Stamm- und Stockaustrieben
-reduction pruning (single branches, parts of the crown, crown);14 Einkürzung (einzelne Äste Teile der Krone Krone)
+reduction pruning (single branches, parts of the crown, crown);14 Einkürzung (einzelne Äste, Teile der Krone, Krone)
 remarks for additional details ;15 Sonstiges siehe Bemerkung
 removement of oak processionary moth;16 Entfernung Eichenprozessionsspinner
 tree protection on construction sites;17 Baumschutz auf Baustellen
@@ -117,8 +117,8 @@ protection against bark damage;18 Schutz vor Rindenschäden
 stabilization of cracked trunk apexes and forks;19 Stabilisierung von aufgerissenen Stammköpfen und Vergabelungen
 amelioration of the root zone;20 Verbesserung des Wurzelbereichs
 treatment of wounds;21 Behandlung von Wunden
-immediate action on damaged crowns following unforeseeable events (e. g. tornado, ice breakage);22 Sofortmaßnahmen an geschädigten Baumkronen nach unvorhersehbaren Ereignissen (z.B. Tornado Eisbruch)
-immediate action on damaged crowns following unforeseeable events (e. g. tornado, ice breakage);25 Sofortmaßnahmen an geschädigten Baumkronen nach unvorhersehbaren Ereignissen (z.B. Tornado Eisbruch)
+immediate action on damaged crowns following unforeseeable events (e. g. tornado, ice breakage);22 Sofortmaßnahmen an geschädigten Baumkronen nach unvorhersehbaren Ereignissen (z.B. Tornado, Eisbruch)
+immediate action on damaged crowns following unforeseeable events (e. g. tornado, ice breakage);25 Sofortmaßnahmen an geschädigten Baumkronen nach unvorhersehbaren Ereignissen (z.B. Tornado, Eisbruch)
 tree supports, propping of branches;23 Baumstützen/Aststützen
 topiary/architectural;24 Formschnitt
 pollarding;25 Kopfbaumschnitt
