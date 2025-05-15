@@ -3,13 +3,14 @@ import re
 import os
 from qgis.core import QgsProject
 
-# === PROJEKT- UND PLUGINPFAD ERMITTELN ===
+# === VERZEICHNISSE ===
 project_dir = os.path.dirname(QgsProject.instance().fileName())
 plugin_dir = os.path.dirname(__file__)
 
-# === DATEIPFADE DEFINIEREN ===
+# === DATEIPFADE ===
 field_mapping_path = os.path.join(plugin_dir, "fields_mapping.csv")
 value_mapping_path = os.path.join(plugin_dir, "value_mapping.csv")
+unmapped_output_path = os.path.join(project_dir, "unmapped_values.txt")
 
 # === ZU PRÜFENDE FELDER ===
 prüffelder = [
@@ -27,45 +28,13 @@ prüffelder = [
 ]
 
 # === HILFSFUNKTIONEN ===
+
 def clean_species(value):
     if value is None:
         return value
     value = re.sub(r'^\d+\s*', '', value)
     value = re.sub(r'\s*\([^)]*\)', '', value)
     return value.strip()
-
-def map_compound_value_exact(text, value_dict, unmapped_set):
-    if not text:
-        return text
-
-    full_clean = text.strip()
-    if full_clean.startswith("{") and full_clean.endswith("}"):
-        inner = full_clean.strip("{}").strip()
-
-        # Fall 1: kompletter Eintrag in value_dict vorhanden (z. B. mit Komma)
-        if inner in value_dict:
-            return "{" + value_dict[inner] + "}"
-
-        # Fall 2: Einzelwert mit Komma, aber nicht direkt im Mapping → Kommas entfernen und erneut prüfen
-        inner_clean = inner.replace(",", "")
-        if inner_clean in value_dict:
-            return "{" + value_dict[inner_clean] + "}"
-
-        # Fall 3: mehrere Werte – aufteilen
-        parts = [p.strip() for p in inner.split(",")]
-        translated = []
-        for item in parts:
-            if item not in value_dict:
-                unmapped_set.add(item)
-            translated.append(value_dict.get(item, item))
-        return "{" + ", ".join(translated) + "}"
-
-    # Kein {...}, normaler Einzelwert
-    val = text.strip()
-    val_clean = val.replace(",", "")
-    if val_clean not in value_dict:
-        unmapped_set.add(val_clean)
-    return value_dict.get(val_clean, val_clean)
 
 def convert_booleans(val):
     if isinstance(val, str):
@@ -76,11 +45,47 @@ def convert_booleans(val):
             return "0"
     return val
 
+def map_compound_value_exact(text, value_dict, unmapped_set):
+    if not text or not isinstance(text, str):
+        return text
+
+    if not (text.startswith("{") and text.endswith("}")):
+        val = text.strip()
+        if val not in value_dict:
+            unmapped_set.add(val)
+        return value_dict.get(val, val)
+
+    inner = text.strip("{}").strip()
+
+    # 1. Kompletter Ausdruck exakt im Mapping?
+    if inner in value_dict:
+        return "{" + value_dict[inner] + "}"
+
+    # 2. Kommas entfernen und erneut prüfen
+    inner_clean = inner.replace(",", "")
+    if inner_clean in value_dict:
+        return "{" + value_dict[inner_clean] + "}"
+
+    # 3. Split versuchen
+    parts = [p.strip() for p in inner.split(",")]
+
+    # Einzelwert trotz Komma → nicht splitten
+    if len(parts) == 1:
+        if parts[0] not in value_dict:
+            unmapped_set.add(parts[0])
+        return "{" + value_dict.get(parts[0], parts[0]) + "}"
+
+    # 4. Mehrere Werte mappen
+    translated = []
+    for part in parts:
+        if part not in value_dict:
+            unmapped_set.add(part)
+        translated.append(value_dict.get(part, part))
+    return "{" + ", ".join(translated) + "}"
+
 # === HAUPTFUNKTION ===
 def convert_kataster(input_csv_path, output_csv_path):
-    unmapped_output_path = os.path.join(os.path.dirname(output_csv_path), "unmapped_values.txt")
-
-    # Mapping-Tabellen laden
+    # Mapping laden
     field_dict = {}
     with open(field_mapping_path, encoding="utf-8", newline='') as f:
         reader = csv.DictReader(f, delimiter=";")
@@ -91,15 +96,15 @@ def convert_kataster(input_csv_path, output_csv_path):
     with open(value_mapping_path, encoding="utf-8", newline='') as f:
         reader = csv.DictReader(f, delimiter=";")
         for row in reader:
-            key = row["old_value"].strip().replace(",", "")
-            value_dict[key] = row["new_value"].strip()
+            value_dict[row["old_value"].strip()] = row["new_value"].strip()
 
-    # Quelldaten einlesen
+    # Input lesen
     with open(input_csv_path, encoding="utf-8", newline='') as f:
         reader = csv.DictReader(f, delimiter=";", quotechar='"')
         input_rows = list(reader)
         original_fields = reader.fieldnames
 
+    # Verarbeitung
     unmapped_values = set()
     output_rows = []
 
@@ -122,19 +127,19 @@ def convert_kataster(input_csv_path, output_csv_path):
 
         output_rows.append(new_row)
 
-    # Feldreihenfolge beibehalten + species anhängen
+    # Spaltenreihenfolge + species
     output_fieldnames = list(dict.fromkeys(
         [field_dict.get(f, f) for f in original_fields] + (["species"] if "species" in output_rows[0] else [])
     ))
 
-    # Nicht gemappte Werte speichern
+    # Ungemappte speichern
     if unmapped_values:
         with open(unmapped_output_path, "w", encoding="utf-8") as f:
-            f.write("Nicht gemappte Werte (value_mapping.csv ergänzen):\n")
+            f.write("Nicht gemappte Werte (value_mapping.csv ergänzen - ggf. inkonsistente Daten oder Probleme mit Kommata):\n")
             for val in sorted(unmapped_values):
                 f.write(f"{val}\n")
 
-    # CSV exportieren
+    # Ergebnis schreiben
     with open(output_csv_path, "w", encoding="utf-8", newline='') as f:
         writer = csv.DictWriter(f, fieldnames=output_fieldnames, delimiter=";", quotechar='"', quoting=csv.QUOTE_ALL)
         writer.writeheader()
