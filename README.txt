@@ -50,6 +50,8 @@ eine Textdatei mit nicht gemappten Werten: unmapped_values.txt
 
 Öffne dein Treesta-Projekt in QGIS
 
+Deaktiviere "Vorgabewert bei Aktualisierung anwenden" beim Feld name
+
 Um die Datei in dein Treesta-Projekt zu laden, ziehe die Datei nicht per Drag & Drop in QGIS! Dadurch werden alle Spalten als Text behandelt, was zu Fehlern beim Einfügen führt.
 
 Richtiges Vorgehen:
