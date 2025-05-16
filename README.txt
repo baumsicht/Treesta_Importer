@@ -81,11 +81,6 @@ Füge die Daten ein (Strg+V)
 
 Speichere die Layeränderung
 
-⚠ Häufige Probleme
-
-Kommas in den Werten können derzeit zu Problemen führen (z. B. bei {15 Gewindestangen, Plomben, Entwässerungsrohre})
-→ Diese werden derzeit nicht zuverlässig erkannt und übersetzt
-Werte, die nicht übersetzt werden, erscheinen in unmapped_values.txt
 
 ℹ️ Hinweis zu weiteren Daten
 

@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TreestaImporterDialogBase</class>
- <widget class="QDialog" name="TreestaImporterDialogBase">
+ <class>TreestaImporterDialog</class>
+ <widget class="QDialog" name="TreestaImporterDialog">
   <property name="windowTitle">
    <string>Treesta Importer</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="labelInstructions">
-     <property name="text">
-      <string>Bitte wählen Sie das alte Kataster (CSV-Datei):</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="lineEditInput"/>
-   </item>
-   <item>
-    <widget class="QPushButton" name="btnBrowse">
-     <property name="text">
-      <string>Durchsuchen...</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="inputLayout">
+     <item>
+      <widget class="QLineEdit" name="lineEditInput">
+       <property name="placeholderText">
+        <string>Pfad zur alten CSV-Datei…</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnBrowse">
+       <property name="text">
+        <string>Durchsuchen…</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QPushButton" name="btnConvert">
@@ -33,7 +34,27 @@
    <item>
     <widget class="QLabel" name="labelStatus">
      <property name="text">
-      <string>Status: bereit</string>
+      <string>Statusmeldung…</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTextEdit" name="textEditUnmapped">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
+      <string>Nicht gemappte Werte werden hier angezeigt…</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnOpenFolder">
+     <property name="text">
+      <string>📂 Ausgabeordner öffnen</string>
      </property>
     </widget>
    </item>
