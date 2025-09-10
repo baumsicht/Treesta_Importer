@@ -1,142 +1,421 @@
+# -*- coding: utf-8 -*-
+"""
+Treesta Importer – Konverter für Baumkataster 3/4 → Treesta-CSV
+
+Features
+- Auto-Erkennung BK3 vs. BK4 anhand Kopfzeilen (Kontrollen_* => BK3, sonst BK4).
+- Nur gemappte Felder werden übernommen; Reihenfolge folgt fields_mapping_*.csv.
+- Maßnahmen: nach Dringlichkeit gruppiert, dedupliziert, kompakt ab measures_1 (+ *_urgency).
+- Aggregatfelder (Features/Habitat/Restriction) werden gesammelt und als {…} ausgegeben.
+- condition/vitality: Priorität Kontrollen_* > zustand/vitalitaet; "1 gut" -> "gut".
+- Koordinaten (inkl. WKT): 1:1-Passthrough – auch ohne Mapping.
+- unmapped_values.txt filtert IDs, Adressen, Namen, Datum/Zeit, einfache Zahlen, true/false,
+  Bemerkung-Felder, Koordinaten (inkl. WKT).
+"""
+
 import csv
-import re
 import os
+import re
+from collections import defaultdict
+from typing import Dict, List, Tuple, Iterable
 
-# === ZU PRÜFENDE FELDER ===
-prüffelder = [
-    "condition", "vitality", "development", "safety_expectation", "tree_safety",
-    "life_expectancy", "restriction", "features_crown", "features_trunk",
-    "features_trunkbase_root_collar", "features_root_surroundings",
-    "measures_1", "measures_1_urgency", "measures_1_access", "measures_1_approval",
-    "measures_2", "measures_2_urgency", "measures_2_access", "measures_2_approval",
-    "measures_3", "measures_3_urgency", "measures_3_access", "measures_3_approval",
-    "measures_4", "measures_4_urgency", "measures_4_access", "measures_4_approval",
-    "measures_5", "measures_5_urgency", "measures_5_access", "measures_5_approval",
-    "habitat_structure_canopy", "habitat_species_canopy",
-    "habitat_structure_trunk", "habitat_species_trunk",
-    "habitat_affected", "habitat_avoidance", "habitat_mitigation", "habitat_replacement"
-]
+# === Aggregierbare Ziel-Felder ===
+AGGREGATE_TARGETS = {
+    "restriction",
+    "features_crown",
+    "features_trunk",
+    "features_trunkbase_root_collar",
+    "features_root_surroundings",
+    "habitat_structure_canopy",
+    "habitat_species_canopy",
+    "habitat_structure_trunk",
+    "habitat_species_trunk",
+}
 
-def clean_species(value):
+# === Alias & Priorität für Zustand/Vitalität ===
+ALIAS_TARGETS = {
+    "Kontrollen_zustand": "condition",
+    "zustand": "condition",
+    "Kontrollen_vitalitaet": "vitality",
+    "vitalitaet": "vitality",
+}
+TARGET_PRIORITY = {
+    "condition": {"Kontrollen_zustand": 0, "zustand": 1},
+    "vitality": {"Kontrollen_vitalitaet": 0, "vitalitaet": 1},
+}
+
+# === Koordinaten-Passthrough (inkl. WKT) ===
+COORD_TARGETS = {
+    "x", "y", "lat", "lon", "lng", "latitude", "longitude",
+    "easting", "northing",
+    "coordinate_x", "coordinate_y", "koord_x", "koord_y",
+    "wkt",
+}
+COORD_SYNONYMS = {"geom", "geometry", "the_geom"}  # falls Mappings andere Namen verwenden
+
+def is_coord_name(name: str) -> bool:
+    if not name:
+        return False
+    ln = name.strip().lower()
+    return ln in COORD_TARGETS or ln in COORD_SYNONYMS
+
+# === Unmapped-Filter ===
+IGNORE_UNMAPPED_TARGETS = {
+    "id", "treenumber", "treenumber2", "sequencenumber", "number",
+    "street", "location", "green_space", "land_use", "access", "city", "zip",
+    "customer", "client", "owner", "contact", "inspector", "controller", "name",
+    "date", "created_at", "updated_at", "timestamp", "inspection_date",
+    "control_date", "measured_at", "survey_date", "last_control_date",
+    *COORD_TARGETS, *COORD_SYNONYMS,
+}
+IGNORE_UNMAPPED_SUBSTRINGS = (
+    "name", "nummer", "number", "street", "straße", "strasse", "ort",
+    "green_space", "location", "date", "time",
+    "bemerkung",
+    "koordinat", "coord",
+)
+
+ISO_TS_RE = re.compile(r'^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}')
+SLASH_TS_RE = re.compile(r'^\d{4}/\d{2}/\d{2}[ T]\d{2}:\d{2}:\d{2}')
+DATE_RE = re.compile(r'^\d{4}[-/]\d{2}[-/]\d{2}$')
+INT_RE = re.compile(r'^\d+$')
+
+
+def should_track_unmapped(target_key: str, raw_value: str) -> bool:
+    if not raw_value:
+        return False
+    v = raw_value.strip()
+    if not v:
+        return False
+    lv = v.lower()
+    if lv in {"true", "false", "0", "1", "ja", "nein"}:
+        return False
+    if INT_RE.match(v):
+        return False
+    if ISO_TS_RE.match(v) or SLASH_TS_RE.match(v) or DATE_RE.match(v):
+        return False
+    tk = (target_key or "").strip().lower()
+    if tk in (x.lower() for x in IGNORE_UNMAPPED_TARGETS):
+        return False
+    for sub in IGNORE_UNMAPPED_SUBSTRINGS:
+        if sub in tk:
+            return False
+    return True
+
+
+# === Hilfsfunktionen ===
+
+def clean_species(value: str) -> str:
     if value is None:
-        return value
-    value = re.sub(r'^\d+\s*', '', value)
-    value = re.sub(r'\s*\([^)]*\)', '', value)
-    return value.strip()
+        return ""
+    v = re.sub(r'^\s*\d+\s*', '', value)
+    v = re.sub(r'\s*\([^)]*\)', '', v)
+    return v.strip()
 
 def convert_booleans(val):
     if isinstance(val, str):
-        lower = val.strip().lower()
-        if lower == "true":
+        s = val.strip().lower()
+        if s == "true":
             return "1"
-        if lower == "false":
+        if s == "false":
             return "0"
     return val
 
-def map_compound_value_exact(text, value_dict, unmapped_set):
+def to_braced(values: Iterable[str]) -> str:
+    seen = set()
+    out = []
+    for v in values:
+        if not v:
+            continue
+        sv = str(v).strip()
+        if not sv:
+            continue
+        if sv.startswith("{") and sv.endswith("}"):
+            sv = sv[1:-1].strip()
+        if sv and sv not in seen:
+            seen.add(sv)
+            out.append(sv)
+    if not out:
+        return ""
+    if len(out) == 1:
+        return "{" + out[0] + "}"
+    return "{" + ", ".join(out) + "}"
+
+
+# === Mapping-CSV-Loader ===
+
+def load_field_mapping(path: str) -> Tuple[Dict[str, str], List[str], Dict[str, str]]:
+    field_map: Dict[str, str] = {}
+    target_order: List[str] = []
+    with open(path, encoding="utf-8", newline='') as f:
+        r = csv.DictReader(f, delimiter=";")
+        cols = [c.strip().lower() for c in (r.fieldnames or [])]
+        if {"old_field", "new_field"}.issubset(cols):
+            key_old, key_new = "old_field", "new_field"
+        elif {"source_field", "target_field"}.issubset(cols):
+            key_old, key_new = "source_field", "target_field"
+        else:
+            raise ValueError("fields_mapping: unerwartete Kopfzeilen.")
+        for row in r:
+            oldf = (row.get(key_old) or "").strip()
+            newf = (row.get(key_new) or "").strip()
+            if not newf:
+                continue
+            field_map[oldf] = newf
+            if newf not in target_order:
+                target_order.append(newf)
+    reverse_map = {newf: oldf for oldf, newf in field_map.items() if oldf}
+    return field_map, target_order, reverse_map
+
+def load_value_mapping(path: str) -> Dict[str, str]:
+    value_map: Dict[str, str] = {}
+    with open(path, encoding="utf-8", newline='') as f:
+        r = csv.DictReader(f, delimiter=";")
+        cols = [c.strip().lower() for c in (r.fieldnames or [])]
+        if {"old_value", "new_value"}.issubset(cols):
+            k_old, k_new = "old_value", "new_value"
+        elif {"source_value", "treesta_value"}.issubset(cols):
+            k_old, k_new = "source_value", "treesta_value"
+        else:
+            if r.fieldnames and len(r.fieldnames) >= 2:
+                k_old, k_new = r.fieldnames[0], r.fieldnames[1]
+            else:
+                raise ValueError("value_mapping: unerwartete Kopfzeilen.")
+        for row in r:
+            oldv = (row.get(k_old) or "").strip()
+            newv = (row.get(k_new) or "").strip()
+            if oldv:
+                value_map[oldv] = newv if newv else oldv
+    return value_map
+
+
+# === Mapping-Funktion ===
+
+def map_compound_value_exact(text: str, value_map: Dict[str, str], unmapped_set: set,
+                             target_key: str = "") -> str:
     if not text or not isinstance(text, str):
         return text
-
     if not (text.startswith("{") and text.endswith("}")):
         val = text.strip()
-        if val not in value_dict:
+        if val and val not in value_map and should_track_unmapped(target_key, val):
             unmapped_set.add(val)
-        return value_dict.get(val, val)
-
+        return value_map.get(val, val)
     inner = text.strip("{}").strip()
-
-    # 1. Kompletter Ausdruck exakt im Mapping?
-    if inner in value_dict:
-        return "{" + value_dict[inner] + "}"
-
-    # 2. Kommas entfernt → prüfen
+    if inner in value_map:
+        return "{" + value_map[inner] + "}"
     inner_clean = inner.replace(",", "")
-    if inner_clean in value_dict:
-        return "{" + value_dict[inner_clean] + "}"
-
-    # 3. Split mit RegEx an ", <Zahl>"
+    if inner_clean in value_map:
+        return "{" + value_map[inner_clean] + "}"
     parts = re.split(r', (?=\d{2,})', inner)
     if len(parts) == 1:
-        part = parts[0]
-        if part not in value_dict:
-            unmapped_set.add(part)
-        return "{" + value_dict.get(part, part) + "}"
-
-    # 4. Mehrere Werte mappen
+        p = parts[0].strip()
+        if p and p not in value_map and should_track_unmapped(target_key, p):
+            unmapped_set.add(p)
+        return "{" + value_map.get(p, p) + "}"
     translated = []
-    for part in parts:
-        part = part.strip()
-        if part not in value_dict:
-            unmapped_set.add(part)
-        translated.append(value_dict.get(part, part))
+    for p in parts:
+        s = p.strip()
+        if s and s not in value_map and should_track_unmapped(target_key, s):
+            unmapped_set.add(s)
+        translated.append(value_map.get(s, s))
     return "{" + ", ".join(translated) + "}"
 
-def convert_kataster(input_csv_path, output_csv_path):
-    plugin_dir = os.path.dirname(__file__)
+
+# === Haupt-Konverter ===
+
+def convert_kataster(input_csv_path: str, field_mapping_path: str, value_mapping_path: str) -> Tuple[str, str]:
     project_dir = os.path.dirname(input_csv_path)
+    out_csv = os.path.join(project_dir, "treesta_import.csv")
+    unmapped_txt = os.path.join(project_dir, "unmapped_values.txt")
 
-    field_mapping_path = os.path.join(plugin_dir, "fields_mapping.csv")
-    value_mapping_path = os.path.join(plugin_dir, "value_mapping.csv")
-    unmapped_output_path = os.path.join(project_dir, "unmapped_values.txt")
+    field_map, target_order, reverse_field = load_field_mapping(field_mapping_path)
+    value_map = load_value_mapping(value_mapping_path)
 
-    # Mapping laden
-    field_dict = {}
-    with open(field_mapping_path, encoding="utf-8", newline='') as f:
-        reader = csv.DictReader(f, delimiter=";")
-        for row in reader:
-            field_dict[row["old_field"]] = row["new_field"]
-
-    value_dict = {}
-    with open(value_mapping_path, encoding="utf-8", newline='') as f:
-        reader = csv.DictReader(f, delimiter=";")
-        for row in reader:
-            value_dict[row["old_value"].strip()] = row["new_value"].strip()
-
-    # Input lesen
     with open(input_csv_path, encoding="utf-8", newline='') as f:
         reader = csv.DictReader(f, delimiter=";", quotechar='"')
-        input_rows = list(reader)
-        original_fields = reader.fieldnames
+        source_rows = list(reader)
 
-    # Verarbeitung
     unmapped_values = set()
-    output_rows = []
+    out_rows: List[Dict[str, str]] = []
 
-    for row in input_rows:
-        new_row = {}
-        for old_key, value in row.items():
-            new_key = field_dict.get(old_key, old_key)
-            val = value.strip() if isinstance(value, str) else value
+    for src in source_rows:
+        dst: Dict[str, str] = {}
+        aggregates: Dict[str, List[str]] = defaultdict(list)
+        measures_by_urgency: Dict[str, List[str]] = defaultdict(list)
 
-            if new_key not in prüffelder:
-                new_val = convert_booleans(val)
+        for old_key, raw_val in src.items():
+            # --- Mapping holen; für Koordinaten 1:1 durchlassen, selbst wenn NICHT gemappt
+            new_key = field_map.get(old_key, "")
+            if not new_key:
+                if is_coord_name(old_key):
+                    new_key = old_key  # Fallback: Name beibehalten (z. B. WKT)
+                else:
+                    continue
+
+            val = (raw_val or "").strip()
+
+            # Maßnahmen
+            if (
+                new_key.startswith("measures_")
+                and new_key[-1].isdigit()
+                and not any(suf in new_key for suf in ("_urgency", "_comment", "_date", "_name", "_time", "_costs"))
+            ):
+                index = new_key.split("_")[1]
+                urg_old = reverse_field.get(f"measures_{index}_urgency", "")
+                urg_raw = (src.get(urg_old, "") or "").strip() if urg_old else ""
+                urg_mapped = map_compound_value_exact(urg_raw, value_map, unmapped_values, target_key=f"measures_{index}_urgency") or ""
+                measure_mapped = map_compound_value_exact(val, value_map, unmapped_values, target_key=f"measures_{index}")
+                measures_by_urgency[urg_mapped].append(measure_mapped)
+                continue
+
+            # Aggregierbare Felder
+            if new_key in AGGREGATE_TARGETS:
+                mapped = map_compound_value_exact(val, value_map, unmapped_values, target_key=new_key)
+                aggregates[new_key].append(mapped)
+                continue
+
+            # Koordinaten-Passthrough (inkl. WKT, GEOM,…)
+            if is_coord_name(new_key) or is_coord_name(old_key):
+                dst[new_key] = val
+                continue
+
+            # Normale Felder
+            if new_key == "species":
+                dst[new_key] = clean_species(val)
             else:
-                new_val = map_compound_value_exact(val, value_dict, unmapped_values)
-                new_val = convert_booleans(new_val)
+                original_new_key = new_key
+                if new_key in ALIAS_TARGETS:
+                    new_key = ALIAS_TARGETS[new_key]
+                if new_key == "vitality":
+                    val = re.sub(r"^\s*\d+\s*", "", val)
+                mapped = map_compound_value_exact(val, value_map, unmapped_values, target_key=new_key)
+                if new_key in ("condition", "vitality"):
+                    prio_map = TARGET_PRIORITY[new_key]
+                    incoming_prio = prio_map.get(original_new_key, 99)
+                    current_prio = dst.get(f"__prio_{new_key}", 999)
+                    if mapped and (incoming_prio < current_prio or not dst.get(new_key)):
+                        dst[new_key] = convert_booleans(mapped)
+                        dst[f"__prio_{new_key}"] = incoming_prio
+                else:
+                    if new_key not in dst or not dst[new_key]:
+                        dst[new_key] = convert_booleans(mapped)
 
-            new_row[new_key] = new_val
+        # Aggregierte Felder
+        for k, arr in aggregates.items():
+            br = to_braced(arr)
+            if br:
+                dst[k] = br
 
-        if "baumart" in row:
-            new_row["species"] = clean_species(row["baumart"])
+        # Maßnahmen sortieren/verdichten
+        urgency_order = {"high": 0, "medium": 1, "low": 2, "": 3,
+                         "hoch": 0, "mittel": 1, "niedrig": 2}
+        items = sorted(measures_by_urgency.items(), key=lambda kv: urgency_order.get(kv[0], 9))
+        normalized = [(urg, to_braced(mlist)) for urg, mlist in items if to_braced(mlist)]
+        for i in range(1, 6):
+            dst.pop(f"measures_{i}", None)
+            dst.pop(f"measures_{i}_urgency", None)
+        slot = 1
+        for urg, braced in normalized:
+            if slot > 5:
+                break
+            dst[f"measures_{slot}"] = braced
+            dst[f"measures_{slot}_urgency"] = urg
+            slot += 1
 
-        output_rows.append(new_row)
+        if "species" not in dst:
+            for alt in ("baumart", "art", "species"):
+                if alt in src and src[alt]:
+                    dst["species"] = clean_species(src[alt])
+                    break
 
-    # Spaltenreihenfolge
-    output_fieldnames = list(dict.fromkeys(
-        [field_dict.get(f, f) for f in original_fields] + (["species"] if "species" in output_rows[0] else [])
-    ))
+        dst.pop("__prio_condition", None)
+        dst.pop("__prio_vitality", None)
+        out_rows.append(dst)
 
-    # Ungemappte Werte speichern
+    # Unmapped schreiben
     if unmapped_values:
-        with open(unmapped_output_path, "w", encoding="utf-8") as f:
-            f.write("Nicht gemappte Werte (value_mapping.csv ergänzen – ggf. inkonsistente Daten oder Probleme mit Trennung):\n")
-            for val in sorted(unmapped_values):
-                f.write(f"{val}\n")
+        with open(unmapped_txt, "w", encoding="utf-8") as f:
+            f.write("Nicht gemappte Werte (value_mapping ergänzen):\n")
+            for v in sorted(unmapped_values):
+                f.write(v + "\n")
 
-    # Output schreiben
-    with open(output_csv_path, "w", encoding="utf-8", newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=output_fieldnames, delimiter=";", quotechar='"', quoting=csv.QUOTE_ALL)
-        writer.writeheader()
-        writer.writerows(output_rows)
+    # Kopfzeilen
+    def add_unique(lst, items):
+        seen = set(lst)
+        for it in items:
+            if it not in seen:
+                lst.append(it)
+                seen.add(it)
+        return lst
 
-    return output_csv_path, unmapped_output_path
+    present_keys, seen_keys = [], set()
+    for r in out_rows:
+        for k in r.keys():
+            if k not in seen_keys:
+                present_keys.append(k)
+                seen_keys.add(k)
+
+    headers = [k for k in target_order if k in seen_keys]
+    generated_priority = []
+    for i in range(1, 6):
+        if f"measures_{i}" in seen_keys:
+            generated_priority.append(f"measures_{i}")
+        if f"measures_{i}_urgency" in seen_keys:
+            generated_priority.append(f"measures_{i}_urgency")
+    headers = add_unique(headers, generated_priority)
+    residual = sorted([k for k in present_keys if k not in headers])
+    headers = add_unique(headers, residual)
+
+    with open(out_csv, "w", encoding="utf-8", newline='') as f:
+        w = csv.DictWriter(f, fieldnames=headers, delimiter=";", quotechar='"', quoting=csv.QUOTE_ALL)
+        w.writeheader()
+        for r in out_rows:
+            w.writerow({k: r.get(k, "") for k in headers})
+
+    return out_csv, unmapped_txt
+
+
+# === Auto-Erkennung & Smart-Convert ===
+
+def detect_profile(input_csv_path: str) -> str:
+    markers_bk3_prefix = ("Kontrollen_",)
+    markers_bk3_exact = {
+        "Kontrollen_zustand", "Kontrollen_vitalitaet",
+        "Kontrollen_massnahme1", "Kontrollen_dringlichkeit1",
+        "Kontrollen_massnahme2", "Kontrollen_dringlichkeit2",
+    }
+    with open(input_csv_path, encoding="utf-8", newline="") as f:
+        r = csv.reader(f, delimiter=";", quotechar='"')
+        headers = next(r, [])
+    headers_norm = [h.strip() for h in headers]
+    if any(h.startswith(markers_bk3_prefix) for h in headers_norm) or any(h in markers_bk3_exact for h in headers_norm):
+        return "baumkataster_3"
+    return "baumkataster_4"
+
+def smart_convert(input_csv_path: str, mappings_dir: str) -> Tuple[str, str, str]:
+    profile = detect_profile(input_csv_path)
+    fields_map = os.path.join(mappings_dir, f"fields_mapping_{profile}.csv")
+    value_map  = os.path.join(mappings_dir, f"value_mapping_{profile}.csv")
+    out_csv, unmapped = convert_kataster(input_csv_path, fields_map, value_map)
+    return out_csv, unmapped, profile
+
+
+if __name__ == "__main__":
+    import argparse
+    ap = argparse.ArgumentParser(description="BK3/BK4 → Treesta Konverter (Auto-Erkennung)")
+    ap.add_argument("input_csv", help="Pfad zu export.csv")
+    ap.add_argument("--fields_mapping_csv", default=None)
+    ap.add_argument("--value_mapping_csv", default=None)
+    ap.add_argument("--mappings_dir", default=".")
+    args = ap.parse_args()
+
+    if args.fields_mapping_csv and args.value_mapping_csv:
+        out_csv, unmapped = convert_kataster(args.input_csv, args.fields_mapping_csv, args.value_mapping_csv)
+        print("OK:", out_csv)
+        if os.path.exists(unmapped):
+            print("Hinweise:", unmapped)
+    else:
+        out_csv, unmapped, profile = smart_convert(args.input_csv, args.mappings_dir)
+        print(f"OK ({profile}):", out_csv)
+        if os.path.exists(unmapped):
+            print("Hinweise:", unmapped)

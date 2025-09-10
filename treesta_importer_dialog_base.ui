@@ -25,6 +25,34 @@
     </layout>
    </item>
    <item>
+ <layout class="QHBoxLayout" name="profileLayout">
+  <item>
+   <widget class="QLabel" name="labelProfile">
+    <property name="text">
+     <string>Importprofil:</string>
+    </property>
+   </widget>
+  </item>
+  <item>
+   <widget class="QComboBox" name="comboBoxProfile">
+    <property name="editable">
+     <bool>false</bool>
+    </property>
+    <item>
+     <property name="text">
+      <string>Baumkataster 4</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Baumkataster 3</string>
+     </property>
+    </item>
+   </widget>
+  </item>
+ </layout>
+</item>
+   <item>
     <widget class="QPushButton" name="btnConvert">
      <property name="text">
       <string>Umwandlung starten</string>

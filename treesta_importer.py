@@ -1,4 +1,3 @@
-
 from qgis.PyQt.QtWidgets import QAction
 from qgis.PyQt.QtGui import QIcon
 import os
@@ -9,9 +8,10 @@ class TreestaImporter:
         self.iface = iface
         self.action = None
         self.dialog = None
+        self.plugin_dir = os.path.dirname(__file__)
 
     def initGui(self):
-        icon_path = os.path.join(os.path.dirname(__file__), 'icon.png')
+        icon_path = os.path.join(self.plugin_dir, 'icon.png')
         self.action = QAction(QIcon(icon_path), 'Treesta Importer', self.iface.mainWindow())
         self.action.triggered.connect(self.run)
         self.iface.addPluginToMenu('Treesta Importer', self.action)
@@ -24,7 +24,7 @@ class TreestaImporter:
 
     def run(self):
         if not self.dialog:
-            self.dialog = TreestaImporterDialog()
+            self.dialog = TreestaImporterDialog(parent=self.iface.mainWindow(), plugin_dir=self.plugin_dir)
         self.dialog.show()
         self.dialog.raise_()
         self.dialog.activateWindow()
