@@ -48,11 +48,9 @@ eine Textdatei mit nicht gemappten Werten: unmapped_values.txt
 
 4. 📥 Import in Treesta
 
-Öffne dein Treesta-Projekt in QGIS
+Öffne deine Datenbank von Treesta in QGIS (nicht das Projekt, nur die Datenbank laden). Vorher Daten sichern!
 
-Deaktiviere "Vorgabewert bei Aktualisierung anwenden" beim Feld name
-
-Um die Datei in dein Treesta-Projekt zu laden, ziehe die Datei nicht per Drag & Drop in QGIS! Dadurch werden alle Spalten als Text behandelt, was zu Fehlern beim Einfügen führt.
+Um die Datei zu laden, ziehe die Datei nicht per Drag & Drop in QGIS! Dadurch werden alle Spalten als Text behandelt, was zu Fehlern beim Einfügen führt.
 
 Richtiges Vorgehen:
 
@@ -71,7 +69,7 @@ Geometrie: Well-Known-Text (WKT)
 
 KBS: EPSG:4326 - WGS 84
 
-QGIS erkennt die Spalten automatisch – insbesondere Zahlen und Booleans korrekt
+QGIS erkennt die Spalten automatisch
 
 Jetzt in den Ziel-Layer:
 
