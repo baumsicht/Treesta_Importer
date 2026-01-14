@@ -1,0 +1,264 @@
+old_field;new_field
+baumnummer;treenumber
+baumnummer2;treenumber2
+laufnummer;sequencenumber
+kunde;customer
+auftraggeber;client
+eigentuemer;owner
+strasse;street
+ort;location
+gruenflaeche;green_space
+;land_use
+;access
+baumart;species
+hoehe;height
+;live_height
+kdm;crown_diameter_1
+kdm2;crown_diameter_2
+kdm3;crown_diameter_3
+kdm4;crown_diameter_4
+stdm;trunk_diameter_1
+stu;trunk_circumference_1
+stdm2;trunk_diameter_2
+stu2;trunk_circumference_2
+stdm3;trunk_diameter_3
+stu3;trunk_circumference_3
+stdm4;trunk_diameter_4
+stu4;trunk_circumference_4
+anzahlst;trunk_number
+stneigung;trunk_inclination
+sthoehe;trunk_height
+pflanzjahr;year_planting
+baumalter;age
+nd;natural_monument
+habitat;habitat
+privat;private
+grenz;boundary_tree
+gift;toxic
+bss;tree_protection_ordinance
+form;topiary
+baumsch_art;tree_basin_type
+baumsch_groesse;tree_basin_area
+;ground_cover
+sia;sia
+bemerkung;comment
+name_erf;name_surveyor
+datum_erf;date_of_data_collection
+gefaellt;removed
+;temp
+zustand;condition
+vitalitaet;vitality
+entwicklung;development
+sicherheit;safety_expectation
+verkehrssicherheit;tree_safety
+lebenserwartung;life_expectancy
+einschraenkung;restriction
+schaden_krone;features_crown
+bemerkung_krone;comment_crown
+schaden_stamm;features_trunk
+bemerkung_stamm;comment_trunk
+schaden_stammfuss_wurzelanlauf;features_trunkbase_root_collar
+bemerkung_stammfuss_wurzelanlauf;comment_trunkbase_root_collar
+schaden_wurzelbereich_baumumfeld;features_root_surroundings
+bemerkung_wurzelbereich_baumumfeld;comment_root_surroundings
+intervall;interval
+name;name
+datum;date
+;crown_dieback_pct
+;crown_missing_pct
+;crown_light_exposure
+;building1_direction
+;building1_distance_m
+;building2_direction
+;building2_distance_m
+;building3_direction
+;building3_distance_m
+;building4_direction
+;building4_distance_m
+massnahme_hoch;measures_1
+;measures_1_urgency
+massnahme_hoch_bemerkung;measures_1_comment
+massnahme_hoch_zugang;measures_1_access
+massnahme_hoch_genehmigung;measures_1_approval
+massnahme_hoch_datum;measures_1_date
+massnahme_hoch_name;measures_1_name
+massnahme_hoch_bis;measures_1_complete_by
+massnahme_hoch_kosten;measures_1_costs
+massnahme_hoch_zeit;measures_1_time
+;crown_cabling_1_further_details
+;crown_cabling_1_aim
+;crown_cabling_1_number_type
+;measures_1_ supervisor
+;measures_1_ mobile_network_reception
+;measures_1_ attendees
+;measures_1_ safety_measures_required
+;measures_1_ own_team_or_subcontractor
+;measures_1_ communication
+;measures_1_ weather_suitable
+;measures_1_ other_hazards
+;measures_1_ double_certified_ppe
+;measures_1_ rope_access_equipment_certified_available
+;measures_1_ rescue_equipment_certified_available
+;measures_1_ first_aid_kit_certified_available
+;measures_1_ tools_sanitized
+;measures_1_ task_discussed_and_team_assigned
+;measures_1_ communication_agreed
+;measures_1_ rescue_plan_discussed
+;measures_1_ experience_sufficient_for_planned_work
+;measures_1_ tree_and_site_safe_for_work
+massnahme_normal;measures_2
+;measures_2_urgency
+massnahme_normal_bemerkung;measures_2_comment
+massnahme_normal_zugang;measures_2_access
+massnahme_normal_genehmigung;measures_2_approval
+massnahme_normal_datum;measures_2_date
+massnahme_normal_name;measures_2_name
+massnahme_normal_bis;measures_2_complete_by
+massnahme_normal_kosten;measures_2_costs
+massnahme_normal_zeit;measures_2_time
+;crown_cabling_2_further_details
+;crown_cabling_2_aim
+;crown_cabling_2_number_type
+;measures_2_ supervisor
+;measures_2_ mobile_network_reception
+;measures_2_ attendees
+;measures_2_ safety_measures_required
+;measures_2_ own_team_or_subcontractor
+;measures_2_ communication
+;measures_2_ weather_suitable
+;measures_2_ other_hazards
+;measures_2_ double_certified_ppe
+;measures_2_ rope_access_equipment_certified_available
+;measures_2_ rescue_equipment_certified_available
+;measures_2_ first_aid_kit_certified_available
+;measures_2_ tools_sanitized
+;measures_2_ task_discussed_and_team_assigned
+;measures_2_ communication_agreed
+;measures_2_ rescue_plan_discussed
+;measures_2_ experience_sufficient_for_planned_work
+;measures_2_ tree_and_site_safe_for_work
+massnahme_niedrig;measures_3
+;measures_3_urgency
+massnahme_niedrig_bemerkung;measures_3_comment
+massnahme_niedrig_zugang;measures_3_access
+massnahme_niedrig_genehmigung;measures_3_approval
+massnahme_niedrig_datum;measures_3_date
+massnahme_niedrig_name;measures_3_name
+massnahme_niedrig_bis;measures_3_complete_by
+massnahme_niedrig_kosten;measures_3_costs
+massnahme_niedrig_zeit;measures_3_time
+;crown_cabling_3_further_details
+;crown_cabling_3_aim
+;crown_cabling_3_number_type
+;measures_3_ supervisor
+;measures_3_ mobile_network_reception
+;measures_3_ attendees
+;measures_3_ safety_measures_required
+;measures_3_ own_team_or_subcontractor
+;measures_3_ communication
+;measures_3_ weather_suitable
+;measures_3_ other_hazards
+;measures_3_ double_certified_ppe
+;measures_3_ rope_access_equipment_certified_available
+;measures_3_ rescue_equipment_certified_available
+;measures_3_ first_aid_kit_certified_available
+;measures_3_ tools_sanitized
+;measures_3_ task_discussed_and_team_assigned
+;measures_3_ communication_agreed
+;measures_3_ rescue_plan_discussed
+;measures_3_ experience_sufficient_for_planned_work
+;measures_3_ tree_and_site_safe_for_work
+massnahme_sofort;measures_4
+;measures_4_urgency
+massnahme_sofort_bemerkung;measures_4_comment
+massnahme_sofort_zugang;measures_4_access
+massnahme_sofort_genehmigung;measures_4_approval
+massnahme_sofort_datum;measures_4_date
+massnahme_sofort_name;measures_4_name
+massnahme_sofort_bis;measures_4_complete_by
+massnahme_sofort_kosten;measures_4_costs
+massnahme_sofort_zeit;measures_4_time
+;crown_cabling_4_further_details
+;crown_cabling_4_aim
+;crown_cabling_4_number_type
+;measures_4_ supervisor
+;measures_4_ mobile_network_reception
+;measures_4_ attendees
+;measures_4_ safety_measures_required
+;measures_4_ own_team_or_subcontractor
+;measures_4_ communication
+;measures_4_ weather_suitable
+;measures_4_ other_hazards
+;measures_4_ double_certified_ppe
+;measures_4_ rope_access_equipment_certified_available
+;measures_4_ rescue_equipment_certified_available
+;measures_4_ first_aid_kit_certified_available
+;measures_4_ tools_sanitized
+;measures_4_ task_discussed_and_team_assigned
+;measures_4_ communication_agreed
+;measures_4_ rescue_plan_discussed
+;measures_4_ experience_sufficient_for_planned_work
+;measures_4_ tree_and_site_safe_for_work
+massnahme_optional;measures_5
+;measures_5_urgency
+massnahme_optional_bemerkung;measures_5_comment
+massnahme_optional_zugang;measures_5_access
+massnahme_optional_genehmigung;measures_5_approval
+massnahme_optional_datum;measures_5_date
+massnahme_optional_name;measures_5_name
+massnahme_optional_bis;measures_5_complete_by
+massnahme_optional_kosten;measures_5_costs
+massnahme_optional_zeit;measures_5_time
+;crown_cabling_5_further_details
+;crown_cabling_5_aim
+;crown_cabling_5_number_type
+;measures_5_ supervisor
+;measures_5_ mobile_network_reception
+;measures_5_ attendees
+;measures_5_ safety_measures_required
+;measures_5_ own_team_or_subcontractor
+;measures_5_ communication
+;measures_5_ weather_suitable
+;measures_5_ other_hazards
+;measures_5_ double_certified_ppe
+;measures_5_ rope_access_equipment_certified_available
+;measures_5_ rescue_equipment_certified_available
+;measures_5_ first_aid_kit_certified_available
+;measures_5_ tools_sanitized
+;measures_5_ task_discussed_and_team_assigned
+;measures_5_ communication_agreed
+;measures_5_ rescue_plan_discussed
+;measures_5_ experience_sufficient_for_planned_work
+;measures_5_ tree_and_site_safe_for_work
+baumfoto;doc_01
+;doc_01_comment
+baumfoto2;doc_02
+;doc_02_comment
+baumfoto3;doc_03
+;doc_03_comment
+baumfoto4;doc_04
+;doc_04_comment
+baumfoto5;doc_05
+;doc_05_comment
+fotokontrolle;doc_06
+fotokontrolle_bemerkung;doc_06_comment
+fotokontrolle2;doc_07
+fotokontrolle2_bemerkung;doc_07_comment
+fotokontrolle3;doc_08
+fotokontrolle3_bemerkung;doc_08_comment
+fotokontrolle4;doc_09
+fotokontrolle4_bemerkung;doc_09_comment
+fotokontrolle5;doc_10
+fotokontrolle5_bemerkung;doc_10_comment
+habitat_struktur_krone;habitat_structure_canopy
+habitat_art_krone;habitat_species_canopy
+habitat_bemerkung_krone;habitat_comment_canopy
+habitat_struktur_stamm;habitat_structure_trunk
+habitat_art_stamm;habitat_species_trunk
+habitat_bemerkung_stamm;habitat_comment_trunk
+habitat_betroffen;habitat_affected
+habitat_vermeidung;habitat_avoidance
+habitat_minderung;habitat_mitigation
+habitat_ersatz;habitat_replacement
+datum_aenderung;date_change
+anzahl;count

@@ -1,0 +1,164 @@
+new_value;old_value
+slightly damaged;nicht/leicht geschädigt
+more severely damaged;stärker geschädigt
+dead;4 abgängig
+good;1 gut
+average;2 mittel
+bad;3 schlecht
+dead;absterbend/tot
+good;gut
+average;mittel
+bad;schlecht
+deficient;abgängig
+youth phase;1 Jugendphase
+maturity phase;2 Reifephase
+age phase;3 Alterungsphase
+youth phase;Jugendphase
+maturity phase;Reifephase
+age phase;Alterungsphase
+dead wood;K13 Totholz
+pruning wounds;K3 Astungswunden oder -fäulen
+branch fracture;K1 Astab- bzw. Ausbrüche
+extraneous vegetation;K4 Baumfremder Bewuchs
+clearance;K10 Lichtraumprofil
+pollarding spot;K8 Kappungsstellen
+crown cabling;K9 Kronensicherung
+decay;08 Fäulen
+cavity;K7 Höhlungen
+crown defects;K6 Fehlentwicklungen
+bark damage;K12 Rindenschäden
+twin stem;K14 Vergabelungen
+epicormic branches or stems;13 Ständer, Steiläste
+fungi;K11 Pilzbefall
+cracks;K2 Astrisse
+foliage (abnormalities, leaf diseases);K5 Belaubung (Auffälligkeiten)
+pests;17 Schadinsekten
+root injuries;01 Wurzelverletzungen
+clearing;Freistellung
+soil deposition;Bodenauf-/ oder -abtrag
+soil removal;04 Bodenabtrag
+soil compaction;Bodenverdichtung
+excavations/trenches;06 Baugruben/-gräben
+soil sealing;Bodenversiegelung
+fungi;Wu3 Pilzbefall
+pests;09 Schadinsekten
+soil heaving;Wu1 Bodenaufwölbung
+soil saturation;11 Bodenvernässung
+soil cracks;Wu2 Bodenrisse
+groundwater lowering / flooding;Grundwasserabsenkung /-anstau
+pruning wounds;S2 Astungswunden
+injuries;S1 Anfahrschäden
+injuries;S13 Verletzungen
+extraneous vegetation;S3 Baumfremder Bewuchs
+decay;S4 Fäulen
+cavity;S6 Höhlungen
+bark damage;S8 Rindenschäden
+clearance;07 Lichter Raum
+fungi;S7 Pilzbefall
+trunk sprouts;S12 Stammaustriebe
+twin stem;S15 Zwiesel
+cracks;S9 Risse
+sap oozing;12 Ausfluss
+growth anomalies;S14 Wuchsanomalien
+compensatory growth;14 Kompensationswachstum
+threaded bars, seals, drainage pipes;S5 Gewindestangen
+pests;S10 Schadinsekten
+inclination;S11 Schrägstand
+injuries;01 Verletzungen
+bark damage;W4 Rindenschäden
+cracks;W5 Risse
+adventitious root;W1 Adventivwurzeln
+cavity;W2 Höhlungen
+fungi;W3 Pilzbefall
+compensatory growth;W6 Stammfußverbreiterung
+basal sprouts;W7 Stockaustriebe
+growth anomalies;W8 Wuchsanomalien
+pests;10 Schadinsekten
+trunk rot;11 Stockfäule
+wounds;12 Wunden
+bats;Fledermäuse
+insects;Insekten
+mammals;Säugetiere
+birds;Vögel
+fungi;Pilze
+lichens;Flechten
+cracks/crevices;Spalten/Risse
+cavities/holes;Höhlungen/Löcher
+ivy;Efeu
+debris;Mulm
+nest;Nest/Horst
+perch;
+low (<15 years);gering (<15 Jahre)
+medium (15-30 years);mittel (15-30 Jahre)
+high (30-60 years);hoch (30-60 Jahre)
+very high (> 60 years);sehr hoch (> 60 Jahre)
+deadwood removal;Totholzentfernung
+deadwood removal (< 3 cm);011 Totholzentfernung (< 3 cm)
+deadwood removal (3 – 10 cm);012 Totholzentfernung (3 – 10 cm)
+deadwood removal (> 10 cm);013 Totholzentfernung (> 10 cm)
+clearance pruning;Lichtraumprofilschnitt
+clearance pruning (sidewalk);021 Lichtraumprofilschnitt (Fußweg)
+clearance pruning (road);022 Lichtraumprofilschnitt (Straße)
+clearance pruning (building);023 Lichtraumprofilschnitt (Gebäude)
+clearance pruning (railway);024 Lichtraumprofilschnitt (Eisenbahn)
+formative pruning of young trees;Jungbaumpflege (Erziehungs- und Aufbauschnitt)
+crown maintenance/crown cleaning;Kronenpflege
+crown cabling;Kronensicherung
+removal of tree bindings and trunk protection material on young trees;Abbau von Baumverankerungen und Stammschutzmaterialien bei Jungbäumen
+detailed inspection;eingehende Untersuchung
+detailed inspection using acoustic tomography;eingehende Untersuchung Schalltomographie
+detailed inspection using drilling resistance measurement;eingehende Untersuchung Bohrwiderstandsmessung
+detailed inspection using pulling test;eingehende Untersuchung Zugversuch/Windreaktionsmessung
+felling;Fällung
+felling complete;081 Fällung komplett
+retain tree trunk;082 Fällung mit Torso
+extraneous vegetation;Entfernung baumfremder Bewuchs
+extraneous vegetation;Baumfremder Bewuchs
+restoration pruning of damaged trees with multiple epicormic branches or stems;Nachbehandlung geschädigter Bäume mit Ständerbildung
+inspection and maintenance of cabling systems;Untersuchung und Wartung von Kronensicherungen
+further inspection;weitere Inaugenscheinnahme
+removal of trunk and basal sprouts;Entfernung Eichenprozessionsspinner
+reduction pruning (single branches, parts of the crown, crown);Einkürzung (einzelne Äste, Teile der Krone, Krone)
+remarks for additional details;Sonstiges siehe Bemerkung
+removement of oak processionary moth;16 Entfernung Eichenprozessionsspinner
+tree protection on construction sites;Baumschutz auf Baustellen
+protection against bark damage;Schutz vor Rindenschäden
+stabilization of cracked trunk apexes and forks;Stabilisierung von aufgerissenen Stammköpfen und Vergabelungen
+amelioration of the root zone;Verbesserung des Wurzelbereichs
+treatment of wounds;Behandlung von Wunden
+immediate action on damaged crowns following unforeseeable events (e. g. tornado, ice breakage);Sofortmaßnahmen an geschädigten Baumkronen nach unvorhersehbaren Ereignissen (z.B. Tornado, Eisbruch)
+tree supports, propping of branches;Baumstützen/Aststützen
+topiary/architectural;Formschnitt
+pollarding;Kopfbaumschnitt
+removal of trunk and basal sprouts;Entfernung von Stamm- und Stockaustrieben
+barrier;Absperrung
+coordination/consultation;Abstimmung/Rücksprache
+crown not/only partially visible;Krone nicht/nur eingeschränkt einsehbar
+trunk not/only partially accessible;Stamm nicht/nur eingeschränkt erreichbar
+construction site;Baustelle
+snow;Schnee
+extraneous vegetation;Baumfremder Bewuchs
+tree not accessible;Baum nicht erreichbar
+inspection not/only partially feasible;Kontrolle nicht/nur eingeschränkt durchführbar
+lower;geringer
+higher;höher
+unknown;unbekannt
+grid;Gitter
+lawn;Rasen
+weed;Unkraut
+bed;Beet
+asphalt;Asphalt
+open;offen
+paving;Pflaster
+sealed;versiegelt
+water-bound path cover;wassergebundene Wegedecke
+provided;gegeben
+provided after measures;nach Maßnahme(n) gegeben
+not assessed;nicht beurteilt
+not provided;nicht gegeben
+alternatively;alternativ
+urgent;hoch
+normal;normal
+low;niedrig
+immediately;sofort
+optional;optional
