@@ -1,12 +1,12 @@
 [general]
 name=Treesta Importer
-description=Konvertiert Daten aus dem Baumsicht Baumkataster für den Import nach Treesta. Converts tree inventory by Baumsicht for import into Treesta.
-version=0.2.1
+description=Konvertiert Daten aus dem Baumsicht Baumkataster 3 oder 4 für den Import nach Treesta. Converts tree inventory by Baumsicht for import into Treesta.
+version=0.3
 qgisMinimumVersion=3.40
 author=Baumsicht
 email=mail@baumsicht.de
 homepage:https://treesta.net
-about=Dieses Plugin hilft bei der Umwandlung von Daten aus dem Baumkataster in das Treesta-kompatible CSV-Format. This plugin helps convert data from the tree cadastre by Baumsicht into the Treesta-compatible CSV format.
+about=Dieses Plugin hilft bei der Umwandlung von Daten aus dem Baumkataster 3 oder 4 in das Treesta-kompatible CSV-Format. This plugin helps convert data from the tree cadastre by Baumsicht into the Treesta-compatible CSV format.
 tracker=https://github.com/baumsicht/Treesta_Importer/issues
 repository=https://github.com/baumsicht/Treesta_Importer
 
