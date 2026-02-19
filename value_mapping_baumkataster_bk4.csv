@@ -9,65 +9,65 @@ deficient;abgängig
 youth phase;Jugendphase
 maturity phase;Reifephase
 age phase;Altersphase
-dead wood;01 Totholz
-pruning wounds;02 Astungswunden oder -fäulen
-branch fracture;03 Astab- bzw. Ausbrüche
-extraneous vegetation;04 Baumfremder Bewuchs
-clearance;05 Lichter Raum
-pollarding spot;06 Kappungsstellen
-crown cabling;07 Kronensicherungen
-decay;08 Fäulen
-cavity;09 Höhlungen
-crown defects;10 Fehlentwicklungen in der Krone
-bark damage;11 Rindenschäden
-twin stem;12 Zwiesel
-epicormic branches or stems;13 Ständer, Steiläste
-fungi;14 Pilzbefall
-cracks;15 Astrisse
-foliage (abnormalities, leaf diseases);16 Belaubung (Auffälligkeiten, Blattkrankheiten)
-pests;17 Schadinsekten
-root injuries;01 Wurzelverletzungen
-clearing;02 Freistellung
-soil deposition;03 Bodenauftrag
-soil removal;04 Bodenabtrag
-soil compaction;05 Bodenverdichtung
-excavations/trenches;06 Baugruben/-gräben
-soil sealing;07 Bodenversiegelung
-fungi;08 Pilzbefall
-pests;09 Schadinsekten
-soil heaving;10 Bodenaufwölbung
-soil saturation;11 Bodenvernässung
-soil cracks;12 Bodenrisse
-groundwater lowering / flooding;13 Grundwasserabsenkung /-anstauungen
-pruning wounds;01 Astungswunden
-injuries;02 Verletzungen
-extraneous vegetation;03 Baumfremder Bewuchs
-decay;04 Fäulen
-cavity;05 Höhlungen
-bark damage;06 Rindenschäden
-clearance;07 Lichter Raum
-fungi;08 Pilzbefall
-trunk sprouts;09 Stammaustriebe
-twin stem;10 Zwiesel
-cracks;11 Risse
-sap oozing;12 Ausfluss
-growth anomalies;13 Wuchsanomalien
-compensatory growth;14 Kompensationswachstum
-threaded bars, seals, drainage pipes;15 Gewindestangen, Plomben, Entwässerungsrohre
-pests;16 Schadinsekten
-inclination;17 Schrägstand
-injuries;01 Verletzungen
-bark damage;02 Rindenschäden
-cracks;03 Risse
-adventitious root;04 Adventiv-, Würgewurzeln
-cavity;05 Höhlungen
-fungi;06 Pilzbefall
-compensatory growth;07 Kompensationswachstum
-basal sprouts;08 Stockaustriebe
-growth anomalies;09 Wuchsanomalien
-pests;10 Schadinsekten
-trunk rot;11 Stockfäule
-wounds;12 Wunden
+dead wood;Totholz
+pruning wounds;Astungswunden oder -fäulen
+branch fracture;Astab- bzw. Ausbrüche
+extraneous vegetation;Baumfremder Bewuchs
+clearance;Lichter Raum
+pollarding spot;Kappungsstellen
+crown cabling;Kronensicherungen
+decay;Fäulen
+cavity;Höhlungen
+crown defects;Fehlentwicklungen in der Krone
+bark damage;Rindenschäden
+twin stem;Zwiesel
+epicormic branches or stems;Ständer, Steiläste
+fungi;Pilzbefall
+cracks;Astrisse
+foliage (abnormalities, leaf diseases);Belaubung (Auffälligkeiten, Blattkrankheiten)
+pests;Schadinsekten
+root injuries;Wurzelverletzungen
+clearing;Freistellung
+soil deposition;Bodenauftrag
+soil removal;Bodenabtrag
+soil compaction;Bodenverdichtung
+excavations/trenches;Baugruben/-gräben
+soil sealing;Bodenversiegelung
+fungi;Pilzbefall
+pests;Schadinsekten
+soil heaving;Bodenaufwölbung
+soil saturation;Bodenvernässung
+soil cracks;Bodenrisse
+groundwater lowering / flooding;Grundwasserabsenkung /-anstauungen
+pruning wounds;Astungswunden
+injuries;Verletzungen
+extraneous vegetation;Baumfremder Bewuchs
+decay;Fäulen
+cavity;Höhlungen
+bark damage;Rindenschäden
+clearance;Lichter Raum
+fungi;Pilzbefall
+trunk sprouts;Stammaustriebe
+twin stem;Zwiesel
+cracks;Risse
+sap oozing;Ausfluss
+growth anomalies;Wuchsanomalien
+compensatory growth;Kompensationswachstum
+threaded bars, seals, drainage pipes;Gewindestangen, Plomben, Entwässerungsrohre
+pests;Schadinsekten
+inclination;Schrägstand
+injuries;Verletzungen
+bark damage;Rindenschäden
+cracks;Risse
+adventitious root;Adventiv-, Würgewurzeln
+cavity;Höhlungen
+fungi;Pilzbefall
+compensatory growth;Kompensationswachstum
+basal sprouts;Stockaustriebe
+growth anomalies;Wuchsanomalien
+pests;Schadinsekten
+trunk rot;Stockfäule
+wounds;Wunden
 bats;Fledermäuse
 insects;Insekten
 mammals;Säugetiere
@@ -80,52 +80,52 @@ ivy;Efeu
 debris;Mulm
 nest;Nest
 perch;Horst
-low (<15 years);gering (<15 Jahre)
+low (<years);gering (< 15Jahre)
 medium (15-30 years);mittel (15-30 Jahre)
 high (30-60 years);hoch (30-60 Jahre)
 very high (> 60 years);sehr hoch (> 60 Jahre)
-deadwood removal;01 Totholzentfernung
-deadwood removal (< 3 cm);011 Totholzentfernung (< 3 cm)
-deadwood removal (3 – 10 cm);012 Totholzentfernung (3 – 10 cm)
-deadwood removal (> 10 cm);013 Totholzentfernung (> 10 cm)
-clearance pruning;02 Lichtraumprofilschnitt
-clearance pruning (sidewalk);021 Lichtraumprofilschnitt (Fußweg)
-clearance pruning (road);022 Lichtraumprofilschnitt (Straße)
-clearance pruning (building);023 Lichtraumprofilschnitt (Gebäude)
-clearance pruning (railway);024 Lichtraumprofilschnitt (Eisenbahn)
-formative pruning of young trees;03 Jungbaumpflege (Erziehungs- und Aufbauschnitt)
-crown maintenance/crown cleaning;04 Kronenpflege
-crown cabling;05 Kronensicherung
-removal of tree bindings and trunk protection material on young trees;06 Abbau von Baumverankerungen und Stammschutzmaterialien bei Jungbäumen
-detailed inspection;18 eingehende Untersuchung
-detailed inspection using acoustic tomography;07 eingehende Untersuchung Schalltomographie
-detailed inspection using drilling resistance measurement;19 eingehende Untersuchung Bohrwiderstandsmessung
-detailed inspection using pulling test;20 eingehende Untersuchung Zugversuch/Windreaktionsmessung
-felling;08 Fällung
-felling complete;081 Fällung komplett
-retain tree trunk;082 Fällung mit Torso
-extraneous vegetation;09 Baumfremder Bewuchs
-restoration pruning of damaged trees with multiple epicormic branches or stems;10 Nachbehandlung geschädigter Bäume mit Ständerbildung
-inspection and maintenance of cabling systems;11 Untersuchung und Wartung von Kronensicherungen
-further inspection;12 weitere Inaugenscheinnahme
-removal of trunk and basal sprouts;13 Entfernung von Stamm- und Stockaustrieben
-reduction pruning (single branches, parts of the crown, crown);14 Einkürzung (einzelne Äste, Teile der Krone, Krone)
-remarks for additional details;15 Sonstiges siehe Bemerkung
-removement of oak processionary moth;16 Entfernung Eichenprozessionsspinner
-tree protection on construction sites;17 Baumschutz auf Baustellen
-protection against bark damage;18 Schutz vor Rindenschäden
-stabilization of cracked trunk apexes and forks;19 Stabilisierung von aufgerissenen Stammköpfen und Vergabelungen
-stabilization of cracked trunk apexes and forks;22 Stabilisierung von aufgerissenen Stammköpfen und Vergabelungen
-amelioration of the root zone;20 Verbesserung des Wurzelbereichs
-treatment of wounds;21 Behandlung von Wunden
-immediate action on damaged crowns following unforeseeable events (e. g. tornado, ice breakage);22 Sofortmaßnahmen an geschädigten Baumkronen nach unvorhersehbaren Ereignissen (z.B. Tornado, Eisbruch)
-immediate action on damaged crowns following unforeseeable events (e. g. tornado, ice breakage);25 Sofortmaßnahmen an geschädigten Baumkronen nach unvorhersehbaren Ereignissen (z.B. Tornado, Eisbruch)
-tree supports, propping of branches;23 Baumstützen/Aststützen
-topiary/architectural;24 Formschnitt
-pollarding;25 Kopfbaumschnitt
-barrier;26 Absperrung
-coordination/consultation;27 Abstimmung/Rücksprache
-coordination/consultation;27 Abstimmung/Rücksprache
+deadwood removal;Totholzentfernung
+deadwood removal (< 3 cm);
+deadwood removal (3 – cm);
+deadwood removal (> cm);
+clearance pruning;Lichtraumprofilschnitt
+clearance pruning (sidewalk);
+clearance pruning (road);
+clearance pruning (building);
+clearance pruning (railway);
+formative pruning of young trees;Jungbaumpflege (Erziehungs- und Aufbauschnitt)
+crown maintenance/crown cleaning;Kronenpflege
+crown cabling;Kronensicherung
+removal of tree bindings and trunk protection material on young trees;Abbau von Baumverankerungen und Stammschutzmaterialien bei Jungbäumen
+detailed inspection;eingehende Untersuchung
+detailed inspection using acoustic tomography;eingehende Untersuchung Schalltomographie
+detailed inspection using drilling resistance measurement;eingehende Untersuchung Bohrwiderstandsmessung
+detailed inspection using pulling test;eingehende Untersuchung Zugversuch/Windreaktionsmessung
+felling;Fällung
+felling complete;
+retain tree trunk;
+extraneous vegetation;Baumfremder Bewuchs
+restoration pruning of damaged trees with multiple epicormic branches or stems;Nachbehandlung geschädigter Bäume mit Ständerbildung
+inspection and maintenance of cabling systems;Untersuchung und Wartung von Kronensicherungen
+further inspection;weitere Inaugenscheinnahme
+removal of trunk and basal sprouts;Entfernung von Stamm- und Stockaustrieben
+reduction pruning (single branches, parts of the crown, crown);Einkürzung (einzelne Äste, Teile der Krone, Krone)
+remarks for additional details;Sonstiges siehe Bemerkung
+removement of oak processionary moth;Entfernung Eichenprozessionsspinner
+tree protection on construction sites;Baumschutz auf Baustellen
+protection against bark damage;Schutz vor Rindenschäden
+stabilization of cracked trunk apexes and forks;Stabilisierung von aufgerissenen Stammköpfen und Vergabelungen
+stabilization of cracked trunk apexes and forks;Stabilisierung von aufgerissenen Stammköpfen und Vergabelungen
+amelioration of the root zone;Verbesserung des Wurzelbereichs
+treatment of wounds;Behandlung von Wunden
+immediate action on damaged crowns following unforeseeable events (e. g. tornado, ice breakage);Sofortmaßnahmen an geschädigten Baumkronen nach unvorhersehbaren Ereignissen (z.B. Tornado, Eisbruch)
+immediate action on damaged crowns following unforeseeable events (e. g. tornado, ice breakage);Sofortmaßnahmen an geschädigten Baumkronen nach unvorhersehbaren Ereignissen (z.B. Tornado, Eisbruch)
+tree supports, propping of branches;Baumstützen/Aststützen
+topiary/architectural;Formschnitt
+pollarding;Kopfbaumschnitt
+barrier;Absperrung
+coordination/consultation;Abstimmung/Rücksprache
+coordination/consultation;Abstimmung/Rücksprache
 crown not/only partially visible;Krone nicht/nur eingeschränkt einsehbar
 trunk not/only partially accessible;Stamm nicht/nur eingeschränkt erreichbar
 construction site;Baustelle
