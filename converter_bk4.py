@@ -30,6 +30,16 @@ IGNORE_UNMAPPED_SUBSTRINGS = (
 
 INT_RE = re.compile(r"^\d+$")
 
+# Feste BK-Maßnahmenlogik:
+# Quellfeld -> (Treesta measures-Feld, Treesta urgency-Feld, urgency-Wert)
+MEASURE_URGENCY_FIELDS = {
+    "massnahme_hoch": ("measures_1", "measures_1_urgency", "urgent"),
+    "massnahme_normal": ("measures_2", "measures_2_urgency", "normal"),
+    "massnahme_niedrig": ("measures_3", "measures_3_urgency", "low"),
+    "massnahme_sofort": ("measures_4", "measures_4_urgency", "immediately"),
+    "massnahme_optional": ("measures_5", "measures_5_urgency", "optional"),
+}
+
 
 def clean_species(value):
     if value is None:
@@ -320,6 +330,19 @@ def map_compound_value_exact(text, value_dict, unmapped_set, target_key=""):
     return ", ".join(translated)
 
 
+def is_effectively_empty_measure_value(value):
+    """
+    Prüft, ob ein Maßnahmenwert als leer gelten soll.
+    """
+    if value is None:
+        return True
+    if not isinstance(value, str):
+        return False
+
+    v = value.strip()
+    return v in {"", "{}", '{""}'}
+
+
 def convert_kataster(input_csv_path, field_mapping_path=None, value_mapping_path=None):
     """
     Plugin-kompatible Signatur:
@@ -386,8 +409,29 @@ def convert_kataster(input_csv_path, field_mapping_path=None, value_mapping_path
         new_row = {}
 
         for old_key, value in row.items():
-            new_key = field_dict.get(old_key, old_key)
             val = value.strip() if isinstance(value, str) else value
+
+            # Sonderlogik für Maßnahmen + Dringlichkeit
+            if old_key in MEASURE_URGENCY_FIELDS:
+                target_measure, target_urgency, urgency_value = MEASURE_URGENCY_FIELDS[old_key]
+
+                mapped_val = map_compound_value_exact(
+                    val,
+                    value_dict,
+                    unmapped_values,
+                    target_key=target_measure
+                )
+                mapped_val = convert_booleans(mapped_val)
+
+                new_row[target_measure] = mapped_val
+
+                if not is_effectively_empty_measure_value(mapped_val):
+                    new_row[target_urgency] = urgency_value
+
+                continue
+
+            # Normale Feldverarbeitung
+            new_key = field_dict.get(old_key, old_key)
 
             if new_key not in PRUEFFELDER:
                 new_val = convert_booleans(val)
@@ -412,6 +456,12 @@ def convert_kataster(input_csv_path, field_mapping_path=None, value_mapping_path
         [field_dict.get(f, f) for f in original_fields] +
         (["species"] if output_rows and "species" in output_rows[0] else [])
     ))
+
+    # Sicherstellen, dass measures_*_urgency auch in den Output-Spalten stehen,
+    # selbst wenn sie nicht in original_fields/feldmapping auftauchen
+    for _, (measure_field, urgency_field, _) in MEASURE_URGENCY_FIELDS.items():
+        if measure_field in output_fieldnames and urgency_field not in output_fieldnames:
+            output_fieldnames.append(urgency_field)
 
     # Ungemappte Werte speichern
     if unmapped_values:
