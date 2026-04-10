@@ -1,7 +1,7 @@
 [general]
 name=Treesta Importer
 description=Konvertiert Daten aus dem Baumsicht Baumkataster 3 oder 4 für den Import nach Treesta. Converts tree inventory by Baumsicht for import into Treesta.
-version=0.5
+version=0.5.1
 qgisMinimumVersion=3.40
 author=Baumsicht
 email=mail@baumsicht.de
