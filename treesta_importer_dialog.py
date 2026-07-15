@@ -7,12 +7,13 @@ from qgis.PyQt import uic
 from qgis.PyQt.QtCore import QUrl
 from qgis.PyQt.QtGui import QDesktopServices
 from qgis.PyQt.QtWidgets import (
+    QComboBox,
     QDialog,
     QFileDialog,
-    QMessageBox,
     QGroupBox,
     QHBoxLayout,
-    QRadioButton,
+    QLabel,
+    QMessageBox,
 )
 
 from .converter_manager import smart_convert
@@ -28,14 +29,44 @@ FORM_CLASS, _ = uic.loadUiType(
 
 class TreestaImporterDialog(QDialog, FORM_CLASS):
 
+    DATA_TYPES = (
+        {
+            "key": "permanent_trees",
+            "label": "Permanente Bäume",
+            "output_filename": "bäume-treesta-import.csv",
+            "field_values": {"temp": "0"},
+        },
+        {
+            "key": "temporary_trees",
+            "label": "Temporäre Bäume",
+            "output_filename": "einzelbäume-treesta-import.csv",
+            "field_values": {"temp": "1"},
+        },
+        {
+            "key": "area",
+            "label": "Fläche",
+            "output_filename": "flächen-treesta-import.csv",
+            "field_values": {"documentation": "1"},
+            "field_values": {"atlas": "0"},
+            "field_renames": {"date": "last_modified_date"},
+        },
+        {
+            "key": "plan",
+            "label": "Plan",
+            "output_filename": "pläne-treesta-import.csv",
+            "field_values": {"atlas": "1"},
+            "field_renames": {"date": "last_modified_date"},
+        },
+    )
+
     def __init__(self, parent=None, plugin_dir=None):
         super().__init__(parent)
         self.setupUi(self)
 
         self.plugin_dir = plugin_dir or os.path.dirname(__file__)
 
-        # Auswahl des Baumtyps ergänzen
-        self._setup_tree_type_selection()
+        # Auswahl des Datentyps ergänzen
+        self._setup_data_type_selection()
 
         # UI-Verkabelung
         self.btnBrowse.clicked.connect(self.browse_input)
@@ -46,54 +77,46 @@ class TreestaImporterDialog(QDialog, FORM_CLASS):
         self.labelStatus.setText("Bereit.")
         self.textEditUnmapped.clear()
 
-    # --- Baumtyp-Auswahl ------------------------------------------------------
+    # --- Datentyp-Auswahl ----------------------------------------------------
 
-    def _setup_tree_type_selection(self):
+    def _setup_data_type_selection(self):
         """
-        Ergänzt die Auswahl zwischen permanenten und temporären Bäumen.
-
-        Permanente Bäume: temp = 0
-        Temporäre Bäume:  temp = 1
+        Ergänzt die Auswahl des zu importierenden Datentyps.
+        Permanente Bäume sind standardmäßig ausgewählt.
         """
-        self.groupTreeType = QGroupBox("Baumtyp")
+        self.groupDataType = QGroupBox("Datentyp")
+        data_type_layout = QHBoxLayout(self.groupDataType)
 
-        tree_type_layout = QHBoxLayout(self.groupTreeType)
+        data_type_layout.addWidget(QLabel("Importieren als:"))
 
-        self.radioPermanent = QRadioButton("Permanente Bäume")
-        self.radioTemporary = QRadioButton("Temporäre Bäume")
+        self.comboDataType = QComboBox()
+        for data_type in self.DATA_TYPES:
+            self.comboDataType.addItem(data_type["label"], data_type)
 
-        # Standardauswahl
-        self.radioPermanent.setChecked(True)
-
-        self.radioPermanent.setToolTip(
-            "Alle Bäume dieser CSV werden mit temp = 0 importiert."
-        )
-        self.radioTemporary.setToolTip(
-            "Alle Bäume dieser CSV werden mit temp = 1 importiert."
+        self.comboDataType.setCurrentIndex(0)
+        self.comboDataType.setToolTip(
+            "Legt den Ziellayer, die Vorgabewerte und den Namen der "
+            "erzeugten CSV-Datei fest."
         )
 
-        tree_type_layout.addWidget(self.radioPermanent)
-        tree_type_layout.addWidget(self.radioTemporary)
-        tree_type_layout.addStretch()
+        data_type_layout.addWidget(self.comboDataType, 1)
 
         # Direkt unterhalb der Dateiauswahl einfügen
-        self.verticalLayout.insertWidget(1, self.groupTreeType)
+        self.verticalLayout.insertWidget(1, self.groupDataType)
 
-    def _selected_temp_value(self):
+    def _selected_data_type(self):
         """
-        Liefert den für die gesamte CSV gewählten temp-Wert.
+        Liefert die Konfiguration des ausgewählten Datentyps.
         """
-        if self.radioTemporary.isChecked():
-            return "1"
+        data_type = self.comboDataType.currentData()
+        if not data_type:
+            return self.DATA_TYPES[0]
+        return data_type
 
-        return "0"
-
-    def _apply_temp_value(self, csv_path, temp_value):
+    def _apply_data_type_values(self, csv_path, data_type):
         """
-        Ergänzt oder überschreibt die Spalte 'temp' in der erzeugten CSV.
-
-        Dadurch müssen die einzelnen BK3-/BK4-Converter nicht angepasst
-        werden.
+        Ergänzt oder überschreibt nur die für den ausgewählten Datentyp
+        vorgesehenen Felder. Alle anderen Felder bleiben unverändert.
         """
         if not os.path.exists(csv_path):
             raise FileNotFoundError(
@@ -120,13 +143,38 @@ class TreestaImporterDialog(QDialog, FORM_CLASS):
                 "Die erzeugte CSV-Datei enthält keine Kopfzeile."
             )
 
-        # Spalte ergänzen, wenn sie noch nicht vorhanden ist
-        if "temp" not in fieldnames:
-            fieldnames.append("temp")
+        field_values = data_type.get("field_values", {})
+        field_renames = data_type.get("field_renames", {})
 
-        # Gewählten Wert für alle Datensätze setzen
+        # Datentypabhängige Feldnamen anpassen. Das gemeinsame Feldmapping
+        # erzeugt für "datum" zunächst "date". Flächen und Pläne erwarten
+        # stattdessen "last_modified_date".
+        for old_field, new_field in field_renames.items():
+            if old_field not in fieldnames:
+                continue
+
+            if new_field in fieldnames:
+                fieldnames.remove(old_field)
+            else:
+                field_index = fieldnames.index(old_field)
+                fieldnames[field_index] = new_field
+
+            for row in rows:
+                old_value = row.pop(old_field, None)
+
+                # Ein vorhandener Wert aus dem umzubenennenden Feld hat
+                # Vorrang. Leere Werte überschreiben keinen bereits
+                # vorhandenen Wert im Zielfeld.
+                if old_value is not None and str(old_value).strip() != "":
+                    row[new_field] = old_value
+
+        for field_name in field_values:
+            if field_name not in fieldnames:
+                fieldnames.append(field_name)
+
         for row in rows:
-            row["temp"] = temp_value
+            for field_name, field_value in field_values.items():
+                row[field_name] = field_value
 
         with open(
             csv_path,
@@ -145,6 +193,21 @@ class TreestaImporterDialog(QDialog, FORM_CLASS):
 
             writer.writeheader()
             writer.writerows(rows)
+
+    def _rename_output_csv(self, csv_path, output_filename):
+        """
+        Benennt die erzeugte Importdatei passend zum gewählten Ziellayer.
+        Eine bereits vorhandene gleichnamige Datei wird ersetzt.
+        """
+        output_path = os.path.join(
+            os.path.dirname(csv_path),
+            output_filename
+        )
+
+        if os.path.abspath(csv_path) != os.path.abspath(output_path):
+            os.replace(csv_path, output_path)
+
+        return output_path
 
     # --- Helper ---------------------------------------------------------------
 
@@ -191,7 +254,7 @@ class TreestaImporterDialog(QDialog, FORM_CLASS):
         self.btnConvert.setEnabled(enabled)
         self.btnBrowse.setEnabled(enabled)
         self.btnOpenFolder.setEnabled(enabled)
-        self.groupTreeType.setEnabled(enabled)
+        self.groupDataType.setEnabled(enabled)
 
     # --- Kernaktion -----------------------------------------------------------
 
@@ -206,7 +269,7 @@ class TreestaImporterDialog(QDialog, FORM_CLASS):
             )
             return
 
-        temp_value = self._selected_temp_value()
+        data_type = self._selected_data_type()
 
         self._set_busy(True)
         self.labelStatus.setText(
@@ -221,10 +284,16 @@ class TreestaImporterDialog(QDialog, FORM_CLASS):
                 self.plugin_dir
             )
 
-            # Gewählten Baumtyp in die Ausgabedatei schreiben
-            self._apply_temp_value(
+            # Vorgabewerte des gewählten Datentyps schreiben
+            self._apply_data_type_values(
                 out_csv,
-                temp_value
+                data_type
+            )
+
+            # Ausgabedatei passend zum Ziellayer benennen
+            out_csv = self._rename_output_csv(
+                out_csv,
+                data_type["output_filename"]
             )
 
             # Profil verständlich darstellen
@@ -235,15 +304,11 @@ class TreestaImporterDialog(QDialog, FORM_CLASS):
             else:
                 profile_text = f"Unbekannt/extern ({profile})"
 
-            if temp_value == "1":
-                tree_type_text = "temporäre Bäume"
-            else:
-                tree_type_text = "permanente Bäume"
-
             self.labelStatus.setText(
                 "✅ Umwandlung abgeschlossen – "
                 f"erkanntes Profil: {profile_text}; "
-                f"Baumtyp: {tree_type_text}"
+                f"Datentyp: {data_type['label']}; "
+                f"Datei: {data_type['output_filename']}"
             )
 
             # Nicht gemappte Werte anzeigen
