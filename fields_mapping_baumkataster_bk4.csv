@@ -262,3 +262,6 @@ habitat_minderung;habitat_mitigation
 habitat_ersatz;habitat_replacement
 datum_aenderung;date_change
 anzahl;count
+nummer;number
+doku;documentation
+bezeichnung;location
