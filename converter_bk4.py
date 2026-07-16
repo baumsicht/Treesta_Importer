@@ -40,6 +40,16 @@ MEASURE_URGENCY_FIELDS = {
     "massnahme_optional": ("measures_5", "measures_5_urgency", "optional"),
 }
 
+# Vorgabewerte der Dringlichkeitsfelder. Diese werden auch ohne geladenes
+# QGIS-Projekt ausdrücklich in die Import-CSV geschrieben.
+DEFAULT_URGENCIES = {
+    "measures_1_urgency": "urgent",
+    "measures_2_urgency": "normal",
+    "measures_3_urgency": "low",
+    "measures_4_urgency": "immediately",
+    "measures_5_urgency": "optional",
+}
+
 
 def clean_species(value):
     if value is None:
@@ -231,13 +241,13 @@ def parse_braced_values(inner_text):
             skipinitialspace=True
         )
         parts = next(reader, [])
-        parts = [normalize_text(p) for p in parts if normalize_text(p)]
-        if parts:
-            return parts
-    except Exception:
-        pass
-
-    return []
+        return [
+            normalize_text(part)
+            for part in parts
+            if normalize_text(part)
+        ]
+    except csv.Error:
+        return []
 
 
 def split_compound_parts(text, has_braces=False):
@@ -449,6 +459,14 @@ def convert_kataster(input_csv_path, field_mapping_path=None, value_mapping_path
         if "baumart" in row:
             new_row["species"] = clean_species(row["baumart"])
 
+        # Leere oder in BK4 nicht vorhandene Dringlichkeiten mit den
+        # Treesta-Vorgabewerten belegen. Bereits vorhandene Werte bleiben
+        # unverändert.
+        for urgency_field, default_value in DEFAULT_URGENCIES.items():
+            current_value = new_row.get(urgency_field)
+            if current_value is None or str(current_value).strip() == "":
+                new_row[urgency_field] = default_value
+
         output_rows.append(new_row)
 
     # Spaltenreihenfolge
@@ -457,11 +475,17 @@ def convert_kataster(input_csv_path, field_mapping_path=None, value_mapping_path
         (["species"] if output_rows and "species" in output_rows[0] else [])
     ))
 
-    # Sicherstellen, dass measures_*_urgency auch in den Output-Spalten stehen,
-    # selbst wenn sie nicht in original_fields/feldmapping auftauchen
-    for _, (measure_field, urgency_field, _) in MEASURE_URGENCY_FIELDS.items():
-        if measure_field in output_fieldnames and urgency_field not in output_fieldnames:
+    # Alle Dringlichkeitsfelder immer in die Ausgabe aufnehmen. Das verhindert
+    # zugleich Fehler des DictWriter wegen zusätzlicher Schlüssel in new_row.
+    for urgency_field in DEFAULT_URGENCIES:
+        if urgency_field not in output_fieldnames:
             output_fieldnames.append(urgency_field)
+
+    # Auch alle sonstigen während der Konvertierung erzeugten Felder aufnehmen.
+    for output_row in output_rows:
+        for field_name in output_row:
+            if field_name not in output_fieldnames:
+                output_fieldnames.append(field_name)
 
     # Ungemappte Werte speichern
     if unmapped_values:
