@@ -1,5 +1,5 @@
 new_value;old_value
-slightly damaged;gesund, leicht geschädigt
+healthy/slightly damaged;gesund, leicht geschädigt
 more severely damaged;stärker geschädigt
 dead;absterbend/tot
 good;gut
@@ -128,7 +128,7 @@ coordination/consultation;Abstimmung/Rücksprache
 coordination/consultation;Abstimmung/Rücksprache
 crown not/only partially visible;Krone nicht/nur eingeschränkt einsehbar
 trunk not/only partially accessible;Stamm nicht/nur eingeschränkt erreichbar
-;Stammfuß nicht/nur eingeschränkt einsehbar 
+;Stammfuß nicht/nur eingeschränkt einsehbar
 construction site;Baustelle
 snow;Schnee
 extraneous vegetation;Baumfremder Bewuchs
